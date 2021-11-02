@@ -1,7 +1,9 @@
-# data in:
+# by hands:
 # add several "in-the-wild" examples 
 # add several complicated "in-the-wild" examples
 # remove bad examples
+
+# data in:
 # data pairs loading
 # cutting by human-size
 # source masks recieving
