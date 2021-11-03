@@ -31,6 +31,18 @@ class Pair:
         pair_img = np.concatenate((self.source_img, self.dest_img), axis=1)
         plt.imshow(cv2.cvtColor(pair_img, cv2.COLOR_BGR2RGB))
         plt.show()
+    def detect_human(self):
+        hog = cv2.HOGDescriptor()
+        hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+        #gray = cv2.cvtColor(self.source_img, cv2.COLOR_RGB2GRAY)
+        boxes, weights = hog.detectMultiScale(self.source_img, winStride=(8,8))
+        self.boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
+        for (xA, yA, xB, yB) in self.boxes:
+            cv2.rectangle(self.source_img, (xA, yA), (xB, yB), (0, 255, 0), 2)
+        for (xA, yA, xB, yB) in self.boxes:
+            cv2.rectangle(self.dest_img, (xA, yA), (xB, yB), (0, 255, 0), 2)
+
+    
 
 class DataFolder:
     def __init__(self, path: str):
@@ -89,21 +101,12 @@ test_data_folder.resize_all_images(size = (1920, 1080))
 
 test_images_pair = test_data_folder.imgs[0]
 #test_images_pair.resize_pair(size=(512, 512))
+test_images_pair.detect_human()
 test_images_pair.show_pair()
 #test_images_pair.show_source()
 
 
-hog = cv2.HOGDescriptor()
-hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
-frame = cv2.imread("datacooking/data/source/0049.jpg0040.jpg")
-gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-
-boxes, weights = hog.detectMultiScale(frame, winStride=(8,8))
-boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
-
-for (xA, yA, xB, yB) in boxes:
-    cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
 plt.imshow(frame, cmap='gray')
 plt.show()
