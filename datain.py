@@ -89,7 +89,24 @@ class DataFolder:
             for pair in self.imgs:
                 pair.resize_pair(size)
             print("All pairs were resized successfully")
-            
+    def detect_all_humans(self):
+        if self.imgs != []:
+            for pair in self.imgs:
+                pair.detect_human()
+            print("All humans were found successfully")
+    def crop_all_pairs(self):
+        if self.imgs != []:
+            for pair in self.imgs:
+                pair.crop()
+            print("All crops were done successfully")
+    def save(self, path, type):
+        if not os.path.exists(path):
+            os.mkdir(path) 
+        if type == "source":
+            for pair, name in zip(self.imgs, self.source):
+                cv2.imwrite(path + name, pair.source_img)
+        else:
+            print("Types except of source doesn't support")
 
     
 data_path = "datacooking/data"
@@ -103,10 +120,11 @@ test_data_folder.unload_pairs()
 test_data_folder.load_pairs()
 test_data_folder.resize_all_images(size = (1920, 1080))
 
-test_images_pair = test_data_folder.imgs[0]
-#test_images_pair.resize_pair(size=(512, 512))
-test_images_pair.detect_human()
-test_images_pair.crop()
-test_images_pair.show_pair()
-#test_images_pair.show_source()
+#test_images_pair = test_data_folder.imgs[0]
+#test_images_pair.detect_human()
+#test_images_pair.crop()
+#test_images_pair.show_pair()
 
+test_data_folder.detect_all_humans()
+test_data_folder.crop_all_pairs()
+test_data_folder.save(path="data_cooking/data/crop_source/", type="source")
