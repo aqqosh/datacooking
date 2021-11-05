@@ -13,9 +13,10 @@ class DataPairingError(Error):
     pass
 
 class Pair:
-    def __init__(self, source_img, dest_img):
+    def __init__(self, source_img, dest_img, param):
         self.source_img = source_img
         self.dest_img = dest_img
+        self.param = param
     def show_source(self):
         plt.imshow(cv2.cvtColor(self.source_img, cv2.COLOR_BGR2RGB))
         plt.show()
@@ -46,6 +47,18 @@ class Pair:
         xA, yA, xB, yB = human
         self.source_img = self.source_img[yA:yB, xA:xB]
         self.dest_img = self.dest_img[yA:yB, xA:xB]
+    def transformation(self, transform, execute_all=False):
+        if execute_all:
+            transformed = transform(image=self.source_img, mask=self.dest_img)
+            return Pair(transformed['image'], 
+                        transformed['mask'], param="artificial")
+        if self.param == "natural":
+            transformed = transform(image=self.source_img, mask=self.dest_img)
+            return Pair(transformed['image'], 
+                        transformed['mask'], param="artificial")
+        return None
+
+
     
 
 class DataFolder:
@@ -76,7 +89,7 @@ class DataFolder:
             for source_name, dest_name in zip(self.source, self.dest):
                 source_img = cv2.imread(self.source_path + source_name, cv2.COLOR_BGR2RGB)
                 dest_img = cv2.imread(self.dest_path + dest_name, cv2.COLOR_BGR2RGB)
-                new_pair = Pair(source_img, dest_img)
+                new_pair = Pair(source_img, dest_img, param="natural")
                 self.imgs.append(new_pair)
             print(str(len(self.imgs)) + " pair of images loaded")
             return True
@@ -107,6 +120,12 @@ class DataFolder:
                 cv2.imwrite(path + name, pair.source_img)
         else:
             print("Types except of source doesn't support")
+    def massive_transform(self, transform, execute_all=False):
+        for pair in self.imgs:
+            new_pair = pair.transformation(transform=transform, 
+                                        execute_all=execute_all)
+            if new_pair != None:
+                self.imgs.append(new_pair)
 
     
 data_path = "datacooking/data"
@@ -127,4 +146,12 @@ test_data_folder.resize_all_images(size = (1920, 1080))
 
 test_data_folder.detect_all_humans()
 test_data_folder.crop_all_pairs()
-test_data_folder.save(path="data_cooking/data/crop_source/", type="source")
+#test_data_folder.save(path="data_cooking/data/crop_source/", type="source")
+
+transform = A.Compose([
+    A.HorizontalFlip(p=1),
+    A.RandomBrightnessContrast(p=0.2),
+])
+
+test_data_folder.massive_transform(transform=transform, execute_all=False)
+test_data_folder.imgs[-3].show_pair()
