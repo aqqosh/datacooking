@@ -126,14 +126,12 @@ class DataFolder(object):
                 pair.Crop()
             print("All Crops were done successfully")
 
-    def Save(self, path, type):
-        if not os.path.exists(path):
-            os.mkdir(path) 
-        if type == "source":
-            for pair, name in zip(self.imgs, self.source):
-                cv2.imwrite(path + name, pair.source_img)
-        else:
-            print("Types except of source doesn't support")
+    def Save(self, path):
+        if self.CheckPathExists(path=path):
+            self.CreateSubfolders(path=path) 
+        for pair, name in zip(self.imgs, self.source):
+            cv2.imwrite(path + "source/" + name, pair.source_img)
+            cv2.imwrite(path + "dest/" + name, pair.dest_img)
 
     def MassiveTransform(self, transform, execute_all=False):
         for pair in self.imgs:
@@ -144,3 +142,30 @@ class DataFolder(object):
                 
     def CheckAmount(self):
         return len(self.imgs)
+
+    def CheckPathExists(self, path):
+        return True if os.path.exists else False
+
+    def CreateSubfolders(self, path):
+        os.mkdir(path)
+        os.mkdir(path + "source/")
+        os.mkdir(path + "dest/")
+
+    def TransformWithoutLoading(self, transform, save_dir="/output/"):
+        if self.CheckFolderAmount():
+            for source_name, dest_name in zip(self.source, self.dest):
+                source_img = cv2.imread(self.source_path + source_name, cv2.COLOR_BGR2RGB)
+                dest_img = cv2.imread(self.dest_path + dest_name, cv2.COLOR_BGR2RGB)
+
+                pair = Pair(source_img, dest_img, param="natural")
+                new_pair = pair.Transformation(transform=transform, execute_all=True)
+
+                if self.CheckPathExists(path=save_dir):
+                    self.CreateSubfolders(path=save_dir)
+
+                cv2.imwrite(save_dir + "source/" + source_name + "t", new_pair.source_img)
+                cv2.imwrite(save_dir + "dest/" + dest_name + "t", new_pair.dest_img)
+
+            print(str(len(self.imgs)) + " pair of images transformed")
+            return True
+        return False

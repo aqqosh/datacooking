@@ -41,6 +41,7 @@ test_data_folder.DetectAllHumans()
 test_data_folder.CropAllPairs()
 #test_data_folder.Save(path="data_cooking/data/Crop_source/", type="source")
 test_data_folder.CheckAmount()
+test_data_folder.Save(path="datacooking/data/cropped_imgs/")
 
 transform1 = A.Compose([
     A.HorizontalFlip(p=1),
