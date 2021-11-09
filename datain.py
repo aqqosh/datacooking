@@ -42,10 +42,11 @@ class Pair(object):
         #gray = cv2.cvtColor(self.source_img, cv2.COLOR_RGB2GRAY)
         boxes, weights = hog.detectMultiScale(self.source_img, winStride=(8,8))
         self.boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
-        for (xA, yA, xB, yB) in self.boxes:
-            cv2.rectangle(self.source_img, (xA, yA), (xB, yB), (0, 255, 0), 2)
-        for (xA, yA, xB, yB) in self.boxes:
-            cv2.rectangle(self.dest_img, (xA, yA), (xB, yB), (0, 255, 0), 2)
+        # those lines display bboxes
+        #for (xA, yA, xB, yB) in self.boxes:
+        #    cv2.rectangle(self.source_img, (xA, yA), (xB, yB), (0, 255, 0), 2)
+        #for (xA, yA, xB, yB) in self.boxes:
+        #    cv2.rectangle(self.dest_img, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
     def Crop(self):
         human = self.boxes[0]
@@ -144,28 +145,43 @@ class DataFolder(object):
         return len(self.imgs)
 
     def CheckPathExists(self, path):
-        return True if os.path.exists else False
+        if os.path.exists(path):
+            return True 
+        else:
+            return False
 
     def CreateSubfolders(self, path):
         os.mkdir(path)
         os.mkdir(path + "source/")
         os.mkdir(path + "dest/")
+        print("Directory created successfully: " + path)
 
-    def TransformWithoutLoading(self, transform, save_dir="/output/"):
+    def TransformWithoutLoading(self, transform, save_dir="/output/", first_transform=True, save_source=True):
+        print(self.CheckPathExists(path=save_dir))
+
+        if self.CheckPathExists(path=save_dir) == False:
+            self.CreateSubfolders(path=save_dir)
+
         if self.CheckFolderAmount():
             for source_name, dest_name in zip(self.source, self.dest):
+
                 source_img = cv2.imread(self.source_path + source_name, cv2.COLOR_BGR2RGB)
                 dest_img = cv2.imread(self.dest_path + dest_name, cv2.COLOR_BGR2RGB)
 
                 pair = Pair(source_img, dest_img, param="natural")
+
+                if first_transform:
+                    pair.ResizePair(size=(1920, 1080))
+                    pair.DetectHuman()
+                    pair.Crop()
+
+                if save_source:
+                    cv2.imwrite(save_dir + "source/" + source_name + ".jpg", pair.source_img)
+                    cv2.imwrite(save_dir + "dest/" + dest_name + ".jpg", pair.dest_img)
+
                 new_pair = pair.Transformation(transform=transform, execute_all=True)
+                cv2.imwrite(save_dir + "source/" + source_name + "t" + ".jpg", new_pair.source_img)
+                cv2.imwrite(save_dir + "dest/" + dest_name + "t" + ".jpg", new_pair.dest_img)
 
-                if self.CheckPathExists(path=save_dir):
-                    self.CreateSubfolders(path=save_dir)
-
-                cv2.imwrite(save_dir + "source/" + source_name + "t", new_pair.source_img)
-                cv2.imwrite(save_dir + "dest/" + dest_name + "t", new_pair.dest_img)
-
-            print(str(len(self.imgs)) + " pair of images transformed")
             return True
         return False
