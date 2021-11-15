@@ -40,10 +40,10 @@ test_data_folder.UnloadPairs()
 #test_images_pair.Crop()
 #test_images_pair.ShowPair()
 
-test_data_folder.DetectAllHumans()
-test_data_folder.CropAllPairs()
-test_data_folder.CheckAmount()
-#test_data_folder.Save(path="datacooking/data/cropped_imgs/")
+#test_data_folder.DetectAllHumans()
+#test_data_folder.CropAllPairs()
+#test_data_folder.CheckAmount()
+#test_data_folder.Save(path="datacooking/data/cropped_imgs_v2/")
 
 transform1 = A.Compose([
     A.HorizontalFlip(p=1),
@@ -52,9 +52,9 @@ transform1 = A.Compose([
 #test_data_folder.MassiveTransform(transform=transform1, execute_all=False)
 #test_data_folder.CheckAmount()
 
-test_data_folder.TransformWithoutLoading(transform=transform1, save_dir="datacooking/data/transformed_imgs/")
+test_data_folder.TransformWithoutLoading(transform=transform1, save_dir="datacooking/data/transformed_imgs_v2/", first_transform=True)
 
-test_data_folder = DataFolder("datacooking/data/transformed_imgs/")
+test_data_folder = DataFolder("datacooking/data/transformed_imgs_v2/")
 test_data_folder.GetSourceNames()
 test_data_folder.GetDestNames()
 test_data_folder.CheckNames()
@@ -64,10 +64,10 @@ transform2 = A.Compose([
     A.Affine(rotate=(-15, 15), p=1, mode=cv2.BORDER_REFLECT)
 ])
 test_data_folder.TransformWithoutLoading(transform=transform2, 
-                                        save_dir="datacooking/data/transformed_imgs_2/",
+                                        save_dir="datacooking/data/transformed_imgs_v2_2/",
                                         first_transform = False)
 
-test_data_folder = DataFolder("datacooking/data/transformed_imgs_2/")
+test_data_folder = DataFolder("datacooking/data/transformed_imgs_v2_2")
 test_data_folder.GetSourceNames()
 test_data_folder.GetDestNames()
 test_data_folder.CheckNames()
@@ -78,7 +78,7 @@ transform3 = A.Compose([
 ])
 
 test_data_folder.TransformWithoutLoading(transform=transform3, 
-                                        save_dir="datacooking/data/transformed_imgs_3/",
+                                        save_dir="datacooking/data/transformed_imgs_v2_3/",
                                         first_transform = False)
 
 #test_data_folder.imgs[-3].ShowPair()
