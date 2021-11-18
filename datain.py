@@ -156,7 +156,7 @@ class DataFolder(object):
         os.mkdir(path + "dest/")
         print("Directory created successfully: " + path)
 
-    def TransformWithoutLoading(self, transform, save_dir="/output/", first_transform=True, save_source=True):
+    def TransformWithoutLoading(self, transform, save_dir="/output/tmp", first_transform=True, save_source=True):
         print(self.CheckPathExists(path=save_dir))
 
         if self.CheckPathExists(path=save_dir) == False:
@@ -183,5 +183,5 @@ class DataFolder(object):
                 cv2.imwrite(save_dir + "source/" + source_name + "t" + ".jpg", new_pair.source_img)
                 cv2.imwrite(save_dir + "dest/" + dest_name + "t" + ".jpg", new_pair.dest_img)
 
-            return True
+            return save_dir
         return False
