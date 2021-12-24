@@ -156,7 +156,7 @@ class DataFolder(object):
         os.mkdir(path + "dest/")
         print("Directory created successfully: " + path)
 
-    def TransformWithoutLoading(self, transform, save_dir="/output/", first_transform=True, save_source=True):
+    def TransformWithoutLoading(self, transform, save_dir="datacooking/output/tmp3/", first_transform=True, save_source=True):
         print(self.CheckPathExists(path=save_dir))
 
         if self.CheckPathExists(path=save_dir) == False:
@@ -176,12 +176,16 @@ class DataFolder(object):
                     pair.Crop()
 
                 if save_source:
-                    cv2.imwrite(save_dir + "source/" + source_name + ".jpg", pair.source_img)
-                    cv2.imwrite(save_dir + "dest/" + dest_name + ".jpg", pair.dest_img)
+                    cv2.imwrite(save_dir + "source/" + source_name[:-4] + ".jpg", pair.source_img)
+                    cv2.imwrite(save_dir + "dest/" + dest_name[:-4] + ".jpg", pair.dest_img)
 
                 new_pair = pair.Transformation(transform=transform, execute_all=True)
-                cv2.imwrite(save_dir + "source/" + source_name + "t" + ".jpg", new_pair.source_img)
-                cv2.imwrite(save_dir + "dest/" + dest_name + "t" + ".jpg", new_pair.dest_img)
+                
+                print(os.getcwd())
+                print(save_dir + "source/" + source_name[:-4] + "t" + ".jpg")
+                
+                cv2.imwrite(save_dir + "source/" + source_name[:-4] + "t3" + ".jpg", new_pair.source_img)
+                cv2.imwrite(save_dir + "dest/" + dest_name[:-4] + "t3" + ".jpg", new_pair.dest_img)
 
-            return True
+            return save_dir
         return False
