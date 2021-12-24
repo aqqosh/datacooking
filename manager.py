@@ -2,7 +2,8 @@ import cv2
 import albumentations as A
 from datacooking.datain import DataFolder, Pair
     
-data_path = "datacooking/data"
+#data_path = "datacooking/data2"
+data_path = "datacooking/output/tmp2"
 test_data_folder = DataFolder(data_path)
 
 test_data_folder.GetSourceNames()
@@ -26,14 +27,15 @@ test_data_folder.UnloadPairs()
 
 transform1 = A.Compose([A.HorizontalFlip(p=1), ])
 transform2 = A.Compose([A.Affine(rotate=(-15, 15), p=1, mode=cv2.BORDER_REFLECT)])
-transform3 = A.Compose([A.Affine(scale=(1.1, 1.9), p=1)])
+transform3 = A.Compose([A.Affine(scale=(1.1, 1.5), p=1)])
+transform4 = A.Compose([A.Affine(scale=(1.1, 1.5), p=1)])
 
 transform_result_path_1 = test_data_folder.TransformWithoutLoading(
                                         transform=transform1, 
                                         first_transform=True)
 
 test_data_folder = DataFolder(transform_result_path_1)
-transform_result_path_2 = test_data_folder.TransformWithoutLoading(transform=transform2)
+transform_result_path_2 = test_data_folder.TransformWithoutLoading(transform=transform2, first_transform=False)
 
 test_data_folder = DataFolder(transform_result_path_2)
-transform_result_path_3 = test_data_folder.TransformWithoutLoading(transform=transform3)
+transform_result_path_3 = test_data_folder.TransformWithoutLoading(transform=transform3, first_transform=False)
