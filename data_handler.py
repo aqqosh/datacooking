@@ -19,18 +19,19 @@ class Data(object):
     
 
 class TrainingData(Data):
-    picklefile = "cloi_storage/_data/test_video/boxes.pickle"
-    data_source_names = "cloi_storage/_data/test_video/output"
-    data_dest_names = "cloi_storage/_data/test_video/dest"
-    source_out = "cloi_storage/_data/test_video/source_out"
-    dest_out = "cloi_storage/_data/test_video/dest_out"
+    #picklefile = "cloi_storage/_data/test_video/boxes.pickle"
+    #data_source_names = "cloi_storage/_data/test_video/output"
+    #data_dest_names = "cloi_storage/_data/test_video/dest"
+    #source_out = "cloi_storage/_data/test_video/source_out"
+    #dest_out = "cloi_storage/_data/test_video/dest_out"
+    #img_size = (512, 512)
+    
+    data_source_names = "cloi_storage/_data/test_video/yerena_out"
+    data_dest_names = "cloi_storage/_data/test_video/yerena_out"
+    source_out = "cloi_storage/_data/test_video/test_data/test_B"
+    dest_out = "cloi_storage/_data/test_video/test_data/test_B"
     
     img_size = (512, 512)
-    
-    @classmethod
-    def get_methadata(cls):
-        with open(cls.picklefile, 'rb') as handle:
-            cls.methadata = pickle.load(handle)
 
     @classmethod
     def get_data_imgs(cls):
@@ -48,56 +49,65 @@ class TrainingData(Data):
             if a != b:
                 return False
         return True
+    
+    @staticmethod
+    def get_bbox(img):
+        a = np.where(img != 0)
+        bbox = np.min(a[0]), np.max(a[0]), np.min(a[1]), np.max(a[1])
+        return bbox
         
     @classmethod
     def execute(cls):
-        def bbox1(img):
-            a = np.where(img != 0)
-            bbox = np.min(a[0]), np.max(a[0]), np.min(a[1]), np.max(a[1])
-            return bbox
-        
         for i, image_name in enumerate(cls.source):
-            metha = cls.methadata[image_name][0]
+            #TODO separate method
             source_img = cv2.imread("{}/{}".format(cls.data_source_names, image_name), cv2.COLOR_BGR2RGB)
             dest_img = cv2.imread("{}/{}".format(cls.data_dest_names, image_name), cv2.COLOR_BGR2RGB) 
-            print(source_img.shape)
-            
-            #round
-            #metha = list(map(lambda x: round(x), metha))
-            #print(metha)
-            #crop by metha = coordinames
-            #xA, yA, xB, yB = metha
-            #source_img = cv2.circle(source_img, (xB, xA), radius=5, color=(0, 0, 255), thickness=-1)
-            #source_img = cv2.circle(source_img, (yB, yA), radius=5, color=(0, 0, 255), thickness=-1)
-            #source_img = source_img[yA: yA + yB, xA : xA + yA]
-            #dest_img = dest_img[yA: yA + yB, xA : xA + yA]
-            #cv2.imshow("source", source_img)
-            #cv2.imshow("dest", dest_img)
-            
-            dat = bbox1(source_img)
-            xA, yA, xB, yB = dat
-            print(dat)
-
+            print("Loaded source image shape: {}".format(source_img.shape))
+            #TODO separate method
+            bbox_coordinates = cls.get_bbox(source_img)
+            xA, yA, xB, yB = bbox_coordinates
+            print("Calculated bbox for image: {}".format(bbox_coordinates))
+            #TODO separate method
             source_img = source_img[xA:yA, xB:yB]
             dest_img = dest_img[xA:yA, xB:yB]
-
+            #TODO separate method
             #resize to parametric image size
             source_img = cv2.resize(source_img, cls.img_size, interpolation = cv2.INTER_AREA)
             dest_img = cv2.resize(dest_img, cls.img_size, interpolation = cv2.INTER_AREA)
-            
+            #TODO separate method
             #save to directory
-            print("Saving {} \n {}/{}".format(image_name, i, len(cls.methadata)))
+            print("Saving {} \n {}/{}".format(image_name, i + 1, len(cls.source)))
             cv2.imwrite("{}/{}".format(cls.source_out, image_name), source_img)
             cv2.imwrite("{}/{}".format(cls.dest_out, image_name), dest_img)
         
 class InferenceData(Data):
+    """
+    1. Посылает пришедшие на вход данные в DensePose
+    2. Depsepose прогоняется через препроцессинг,
+        сохраняются коодинаты bboxа и size оригинала 
+        для каждого изображения
+    3. Данные отправляются в pix2pixHD
+    4. В результате затирается зеленый фон, сглаживается
+    5. Результ ресайзится и пастится на оригинальное
+        изображение
+    6. *Вырезаются руки-ноги
+    7. *Применяется LAMA
+    """
     @classmethod
-    def get_methadata():
-        pass
+    def get_densepose_data(cls):
+        cls.bboxes = {}
+        cls.sizes = {}
+        
+        cls.original_images = {}
+        cls.processed_images = {}
     
     @classmethod
-    def get_data_imgs(cls):
-        pass
+    def get_pix2pixHD_data(cls):
+        cls.pix2pix_images = {}
+        
+    @classmethod
+    def postprocessing(cls):
+        cls.result_imges = {}
     
     @classmethod
     def execute():
