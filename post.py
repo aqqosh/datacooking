@@ -16,6 +16,12 @@ class DataProcessing(object):
     
     def __init__(self, data):
         self.data = data
+        
+    def __hash_f(self):
+        pass
+    
+    def __unhash_f(self):
+        pass
     
     def apply_densepose(self):
         #send request to flask densepose
@@ -35,7 +41,7 @@ class DataProcessing(object):
         
         #TODO: unhash function
         #if not original_size or not bbox:
-        #    original_size, bbox = unhash(image_hash)
+        #    original_size, bbox = DataProcessing.__unhash_f(image_hash)
         
         result_img = resize(result_img, original_size)
         final_result = blend(input_img, result_img, bbox)
@@ -45,12 +51,6 @@ class DataProcessing(object):
     def remove_original_garment(self):
         #send request to flask lama
         pass
-
-
-input_img_path = "datacooking/post/input.jpg"
-result_img_path = "datacooking/post/result.jpg"
-input_img = cv2.imread(input_img_path)
-result_img = cv2.imread(result_img_path)
 
 
 
@@ -120,6 +120,11 @@ def show_img():
 #result_img = jpg2png(result_img)
 #plt.imshow(cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB))
 #plt.show()
+
+#input_img_path = "datacooking/post/input.jpg"
+#result_img_path = "datacooking/post/result.jpg"
+#input_img = cv2.imread(input_img_path)
+#result_img = cv2.imread(result_img_path)
 
 
 """
