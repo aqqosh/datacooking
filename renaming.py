@@ -1,7 +1,7 @@
 import os
 import glob
 
-path = r'C:\Users\Elizaveta Koroleva\Desktop\ProdData\source_sitting'
+path = r'C:\Users\Elizaveta Koroleva\Desktop\ProdData - Copy\source_pose'
 files = os.listdir(path)
 
 #files = glob.iglob(path + '/*.' + "jpg")
@@ -9,7 +9,7 @@ files = os.listdir(path)
 
 for index, file in enumerate(files):
     #print(str(file)[9:-5])
-    #index += 598
+    index += 372
     os.rename(os.path.join(path, file), os.path.join(path, ''.join([str(index), '.jpg'])))
 
 
